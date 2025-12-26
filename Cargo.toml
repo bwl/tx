@@ -1,0 +1,21 @@
+[package]
+name = "tx"
+version = "0.1.0"
+edition = "2024"
+description = "Simple speech-to-text CLI - start talking, hit Enter, get text"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/bwl/tx"
+
+[[bin]]
+name = "tx"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+anyhow = "1"
+cpal = "0.15"
+whisper-rs = "0.15"
+hound = "3.5"
+arboard = "3"
+chrono = "0.4"
+dirs = "6"
