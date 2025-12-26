@@ -16,18 +16,6 @@ brew install bwl/ettio/tx
 cargo install --path .
 ```
 
-## Setup
-
-tx requires a Whisper model file. Download the base English model:
-
-```bash
-mkdir -p ~/.local/share/tx/models
-curl -L https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin \
-  -o ~/.local/share/tx/models/ggml-base.en.bin
-```
-
-Or set `TX_MODEL_PATH` to point to your model file.
-
 ## Usage
 
 ```bash
@@ -50,10 +38,13 @@ tx -q | pbcopy        # Pipe to other commands
 
 ## How it works
 
-1. Starts recording immediately on launch
-2. Press Enter to stop recording
-3. Transcribes locally using Whisper (offline, private)
-4. Saves timestamped file and copies to clipboard
+1. On first run, downloads the Whisper model (~141MB)
+2. Starts recording immediately
+3. Press Enter to stop recording
+4. Transcribes locally using Whisper (offline, private)
+5. Saves timestamped file and copies to clipboard
+
+Set `TX_MODEL_PATH` to use a custom model location.
 
 ## License
 
