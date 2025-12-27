@@ -56,6 +56,9 @@ enum Command {
         /// Transcript ID (or prefix)
         id: String,
     },
+
+    /// Show the most recent transcript
+    Last,
 }
 
 fn main() {
@@ -73,6 +76,7 @@ fn run() -> Result<()> {
         Some(Command::History { limit }) => history(limit),
         Some(Command::Show { id }) => show(&id),
         Some(Command::Copy { id }) => copy(&id),
+        Some(Command::Last) => last(),
     }
 }
 
@@ -194,6 +198,23 @@ fn copy(id: &str) -> Result<()> {
         }
         None => {
             eprintln!("No transcript found with ID starting with '{}'", id);
+            process::exit(1);
+        }
+    }
+
+    Ok(())
+}
+
+fn last() -> Result<()> {
+    let conn = db::open()?;
+    let transcripts = db::list(&conn, 1)?;
+
+    match transcripts.into_iter().next() {
+        Some(t) => {
+            println!("{}", t.text);
+        }
+        None => {
+            eprintln!("No transcripts yet.");
             process::exit(1);
         }
     }
