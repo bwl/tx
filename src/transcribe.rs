@@ -1,11 +1,18 @@
 //! Whisper transcription via whisper-rs.
 
 use anyhow::{Context, Result};
+use std::ffi::c_void;
+use std::os::raw::c_char;
 use std::path::Path;
 use std::sync::Once;
 use whisper_rs::{FullParams, SamplingStrategy, WhisperContext, WhisperContextParameters};
 
 static INIT_LOGGING: Once = Once::new();
+
+/// No-op log callback to suppress whisper.cpp output
+unsafe extern "C" fn silent_log_callback(_level: u32, _msg: *const c_char, _user_data: *mut c_void) {
+    // Do nothing - suppress all logging
+}
 
 /// Transcribes audio samples using Whisper.
 ///
@@ -15,7 +22,7 @@ pub fn transcribe(audio: &[f32], model_path: &Path, quiet: bool) -> Result<Strin
     INIT_LOGGING.call_once(|| {
         unsafe {
             #[allow(deprecated)]
-            whisper_rs::set_log_callback(None, std::ptr::null_mut());
+            whisper_rs::set_log_callback(Some(silent_log_callback), std::ptr::null_mut());
         }
     });
 
