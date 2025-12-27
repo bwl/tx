@@ -9,6 +9,7 @@ mod transcribe;
 
 use anyhow::Result;
 use clap::Parser;
+use std::io::{self, Write};
 use std::path::PathBuf;
 use std::process;
 
@@ -52,8 +53,20 @@ fn run() -> Result<()> {
         process::exit(1);
     }
 
+    // Show transcribing status in quiet mode
+    if cli.quiet {
+        eprint!("\x1b[90mTranscribing...\x1b[0m");
+        io::stderr().flush().ok();
+    }
+
     // Transcribe
     let text = transcribe::transcribe(&samples, &model_path, cli.quiet)?;
+
+    // Clear status line in quiet mode
+    if cli.quiet {
+        eprint!("\r\x1b[K");
+        io::stderr().flush().ok();
+    }
 
     if text.is_empty() {
         eprintln!("Could not transcribe.");

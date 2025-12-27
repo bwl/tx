@@ -2,7 +2,7 @@
 
 use anyhow::{Context, Result};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
-use std::io::{self, BufRead};
+use std::io::{self, BufRead, Write};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
@@ -100,15 +100,25 @@ pub fn record_until_enter(quiet: bool) -> Result<Vec<f32>> {
         _ => anyhow::bail!("Unsupported sample format: {:?}", sample_format),
     };
 
-    if !quiet {
+    stream.play().context("Failed to start audio stream")?;
+
+    // Show status message
+    if quiet {
+        eprint!("\x1b[90mListening... (press Enter)\x1b[0m");
+    } else {
         eprintln!("\x1b[93m[Recording...]\x1b[0m Press ENTER when done.");
     }
-
-    stream.play().context("Failed to start audio stream")?;
+    io::stderr().flush().ok();
 
     // Wait for Enter
     let stdin = io::stdin();
     let _ = stdin.lock().lines().next();
+
+    // Clear the status line in quiet mode
+    if quiet {
+        eprint!("\r\x1b[K");
+        io::stderr().flush().ok();
+    }
 
     stop_flag.store(true, Ordering::Relaxed);
     drop(stream);
