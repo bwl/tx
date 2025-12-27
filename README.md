@@ -28,13 +28,13 @@ tx -q | pbcopy        # Pipe to other commands
 
 ## History
 
-All transcripts are saved to a local SQLite database.
+Transcripts are saved to `~/.local/share/tx/history.db`.
 
 ```bash
-tx history            # Show recent transcripts
-tx history -l 20      # Show last 20 transcripts
-tx show abc123        # Print transcript by ID (prefix match)
-tx copy abc123        # Copy transcript to clipboard
+tx last               # Print most recent transcript
+tx history            # List recent transcripts
+tx show abc123        # Print by ID (prefix match)
+tx copy abc123        # Copy to clipboard by ID
 ```
 
 ## Options
