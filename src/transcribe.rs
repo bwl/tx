@@ -2,12 +2,23 @@
 
 use anyhow::{Context, Result};
 use std::path::Path;
+use std::sync::Once;
 use whisper_rs::{FullParams, SamplingStrategy, WhisperContext, WhisperContextParameters};
+
+static INIT_LOGGING: Once = Once::new();
 
 /// Transcribes audio samples using Whisper.
 ///
 /// Audio should be f32 samples at 16kHz mono.
 pub fn transcribe(audio: &[f32], model_path: &Path, quiet: bool) -> Result<String> {
+    // Suppress whisper.cpp logging
+    INIT_LOGGING.call_once(|| {
+        unsafe {
+            #[allow(deprecated)]
+            whisper_rs::set_log_callback(None, std::ptr::null_mut());
+        }
+    });
+
     if !quiet {
         eprintln!("\x1b[90m(Loading model...)\x1b[0m");
     }
